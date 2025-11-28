@@ -61,7 +61,7 @@ def send_msg():
 # ──────────────────────────────────────────────
 # Ваше расписание — НЕ меняю
 # ──────────────────────────────────────────────
-send_time = "19:40"  # как у вас было
+send_time = "18:50"  # как у вас было
 
 schedule.every().monday.at(send_time).do(send_msg)
 schedule.every().tuesday.at(send_time).do(send_msg)
