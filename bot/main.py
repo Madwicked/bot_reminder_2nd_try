@@ -3,6 +3,7 @@ import time
 import requests
 import schedule
 from flask import Flask
+import threading
 
 # ──────────────────────────────────────────────
 # Flask — чтобы Render не засыпал
@@ -11,33 +12,35 @@ app = Flask(__name__)
 
 @app.get("/")
 def home():
-    return "Bot is running!"
+    return "Bot running!"
 
 # ──────────────────────────────────────────────
 # Telegram
 # ──────────────────────────────────────────────
 TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = -4993967051  # группа
-if not TOKEN:
-    raise ValueError("BOT_TOKEN отсутствует. Добавьте переменную окружения в Render.")
+CHAT_ID = -4993967051
 
-# Многострочный HTML текст для Telegram
+if not TOKEN:
+    raise ValueError("BOT_TOKEN отсутствует! Добавьте переменную окружения в Render.")
+
+# Многострочный HTML-текст
 TEXT = """
-<b>‼️Напоминание‼️</b>
-<b>‼️Не забудь заполнить тайминги‼️</b>
+<b>‼️Напоминание‼️</b><br>
+<b>‼️Не забудь заполнить тайминги‼️</b><br><br>
 
 📋 <b>Форма для заполнения:</b><br>
-Web: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd6_bfaZ796YTEjf8rwmseQ8QZe05ZDQxI4KFHgTsWqoKFcmg/viewform">ссылка</a> 💻<br>
-Mobile: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_4mgsQa3pQi2wzuuOhU7y7XbzL1ruGNnfna4tYWL3AVSEpQ/viewform">ссылка</a> 📱<br><br>
+💻 Web: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd6_bfaZ796YTEjf8rwmseQ8QZe05ZDQxI4KFHgTsWqoKFcmg/viewform">ссылка</a><br>
+📱 Mobile: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_4mgsQa3pQi2wzuuOhU7y7XbzL1ruGNnfna4tYWL3AVSEpQ/viewform">ссылка</a><br><br>
 
 🔍 <b>Просмотр таймингов:</b><br>
 <a href="https://docs.google.com/spreadsheets/d/1VM8PoYVnGRnCutLV7nvMJ9U1qT8G5d4Y8M-sMjopmCA/edit?gid=1788470692#gid=1788470692">открыть таблицу</a>
 """
 
 # ──────────────────────────────────────────────
-# Функция отправки сообщения
+# Отправка сообщения
 # ──────────────────────────────────────────────
 def send_msg():
+    print("Пытаюсь отправить сообщение...")
     try:
         response = requests.get(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
@@ -47,42 +50,39 @@ def send_msg():
                 "parse_mode": "HTML"
             }
         )
+        print("Ответ Telegram:", response.text)
         if response.status_code == 200:
-            print("✔ Сообщение успешно отправлено!")
+            print("✔ Сообщение отправлено!")
         else:
-            print("❌ Ошибка ответа Telegram:", response.text)
+            print("❌ Ошибка:", response.text)
     except Exception as e:
-        print("⚠ Ошибка при отправке запроса:", e)
+        print("⚠ Ошибка отправки:", e)
 
 # ──────────────────────────────────────────────
-# Расписание (UTC!)
+# Ваше расписание — НЕ меняю
 # ──────────────────────────────────────────────
-# Пример: 15:00 по Киеву/Москве (UTC+2/UTC+3)
-# Значит в UTC это может быть 12:00 или 13:00
-SEND_TIME_UTC = "18:15" # летом -2 от utc, зимой -1
+send_time = "19:40"  # как у вас было
 
-schedule.every().monday.at(SEND_TIME_UTC).do(send_msg)
-schedule.every().tuesday.at(SEND_TIME_UTC).do(send_msg)
-schedule.every().wednesday.at(SEND_TIME_UTC).do(send_msg)
-schedule.every().thursday.at(SEND_TIME_UTC).do(send_msg)
-schedule.every().friday.at(SEND_TIME_UTC).do(send_msg)
-schedule.every().saturday.at(SEND_TIME_UTC).do(send_msg)
+schedule.every().monday.at(send_time).do(send_msg)
+schedule.every().tuesday.at(send_time).do(send_msg)
+schedule.every().wednesday.at(send_time).do(send_msg)
+schedule.every().thursday.at(send_time).do(send_msg)
+schedule.every().friday.at(send_time).do(send_msg)
+schedule.every().saturday.at(send_time).do(send_msg)
 
-print("Бот запущен и ждёт времени отправки...", flush=True)
+print("Бот запущен и ждёт времени отправки...")
 
 # ──────────────────────────────────────────────
-# Основной цикл
+# Фоновый поток для schedule
 # ──────────────────────────────────────────────
-def run_scheduler():
+def scheduler_loop():
     while True:
         schedule.run_pending()
         time.sleep(1)
 
 # ──────────────────────────────────────────────
-# Запуск Flask + scheduler
-# Render запускает этот файл как web-service
+# Запуск Flask + планировщика
 # ──────────────────────────────────────────────
 if __name__ == "__main__":
-    import threading
-    threading.Thread(target=run_scheduler, daemon=True).start()
+    threading.Thread(target=scheduler_loop, daemon=True).start()
     app.run(host="0.0.0.0", port=10000)
