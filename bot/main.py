@@ -1,88 +1,70 @@
 import os
 import time
+import threading
 import requests
 import schedule
 from flask import Flask
-import threading
 
-# ──────────────────────────────────────────────
-# Flask — чтобы Render не засыпал
-# ──────────────────────────────────────────────
+# ---------- Flask server для Render ----------
 app = Flask(__name__)
 
-@app.get("/")
+@app.route("/")
 def home():
-    return "Bot running!"
+    return "Bot is running!"
 
-# ──────────────────────────────────────────────
-# Telegram
-# ──────────────────────────────────────────────
+def start_flask():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
+
+# ---------- Telegram Bot ----------
 TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = -4993967051
-
 if not TOKEN:
-    raise ValueError("BOT_TOKEN отсутствует! Добавьте переменную окружения в Render.")
+    raise ValueError("BOT_TOKEN не задан! Проверьте переменные окружения на Render.")
 
-# Многострочный HTML-текст
-TEXT = """
-<b>‼️Напоминание‼️</b><br>
-<b>‼️Не забудь заполнить тайминги‼️</b><br><br>
+CHAT_ID = -4993967051  # ID группы
+TEXT = "Напоминание: не забываем сделать задачу!"
 
-📋 <b>Форма для заполнения:</b><br>
-💻 Web: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd6_bfaZ796YTEjf8rwmseQ8QZe05ZDQxI4KFHgTsWqoKFcmg/viewform">ссылка</a><br>
-📱 Mobile: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_4mgsQa3pQi2wzuuOhU7y7XbzL1ruGNnfna4tYWL3AVSEpQ/viewform">ссылка</a><br><br>
-
-🔍 <b>Просмотр таймингов:</b><br>
-<a href="https://docs.google.com/spreadsheets/d/1VM8PoYVnGRnCutLV7nvMJ9U1qT8G5d4Y8M-sMjopmCA/edit?gid=1788470692#gid=1788470692">открыть таблицу</a>
-"""
-
-# ──────────────────────────────────────────────
-# Отправка сообщения
-# ──────────────────────────────────────────────
 def send_msg():
-    print("Пытаюсь отправить сообщение...")
     try:
         response = requests.get(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            params={
-                "chat_id": CHAT_ID,
-                "text": TEXT,
-                "parse_mode": "HTML"
-            }
+            params={"chat_id": CHAT_ID, "text": TEXT}
         )
-        print("Ответ Telegram:", response.text)
         if response.status_code == 200:
-            print("✔ Сообщение отправлено!")
+            print("Сообщение отправлено!")
         else:
-            print("❌ Ошибка:", response.text)
+            print("Ошибка при отправке:", response.text)
     except Exception as e:
-        print("⚠ Ошибка отправки:", e)
+        print("Ошибка при запросе:", e)
 
-# ──────────────────────────────────────────────
-# Ваше расписание — НЕ меняю
-# ──────────────────────────────────────────────
-send_time = "18:50"  # как у вас было
+# Время отправки (UTC+1/UTC+2)
+send_time = "19:05"  # поменяй на свое время
 
-schedule.every().monday.at(send_time).do(send_msg)
-schedule.every().tuesday.at(send_time).do(send_msg)
-schedule.every().wednesday.at(send_time).do(send_msg)
-schedule.every().thursday.at(send_time).do(send_msg)
-schedule.every().friday.at(send_time).do(send_msg)
-schedule.every().saturday.at(send_time).do(send_msg)
+# Планирование (каждый день кроме воскресенья)
+for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]:
+    getattr(schedule.every(), day).at(send_time).do(send_msg)
 
-print("Бот запущен и ждёт времени отправки...")
+# ---------- Ping для предотвращения сна Render ----------
+def ping_self():
+    try:
+        port = int(os.environ.get("PORT", 8080))
+        requests.get(f"http://localhost:{port}/")
+        print("Ping self OK")
+    except Exception as e:
+        print("Ошибка ping:", e)
 
-# ──────────────────────────────────────────────
-# Фоновый поток для schedule
-# ──────────────────────────────────────────────
-def scheduler_loop():
+schedule.every(10).minutes.do(ping_self)
+
+# ---------- Запуск schedule ----------
+def run_schedule():
+    print("Бот запущен. Ждем времени отправки...")
     while True:
         schedule.run_pending()
         time.sleep(1)
 
-# ──────────────────────────────────────────────
-# Запуск Flask + планировщика
-# ──────────────────────────────────────────────
+# ---------- Запуск в потоках ----------
 if __name__ == "__main__":
-    threading.Thread(target=scheduler_loop, daemon=True).start()
-    app.run(host="0.0.0.0", port=10000)
+    # Flask сервер
+    threading.Thread(target=start_flask).start()
+    # Schedule (бот + ping)
+    run_schedule()
