@@ -32,7 +32,7 @@ def send_msg():
         print("Ошибка отправки:", e)
 
 # Расписание
-send_time = "16:22"
+send_time = "19:45"
 
 schedule.every().monday.at(send_time).do(send_msg)
 schedule.every().tuesday.at(send_time).do(send_msg)
