@@ -38,7 +38,7 @@ def send_msg():
         print("Ошибка при запросе:", e)
 
 # Время отправки (UTC+1/UTC+2)
-send_time = "18:16"  # поменяй на свое время
+send_time = "17:50"  # поменяй на свое время
 
 # Планирование (каждый день кроме воскресенья)
 for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]:
