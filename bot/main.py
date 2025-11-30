@@ -24,13 +24,13 @@ if not TOKEN:
 CHAT_ID = -4993967051
 
 TEXT = (
-    "‼️*Напоминание*‼️\n"
-    "‼️*Не забудь заполнить тайминги*‼️\n\n"
-    "📋 *Форма для заполнения:*  \n"
-    "Web 👉 https://docs.google.com/forms/d/e/1FAIpQLSd6_bfaZ796YTEjf8rwmseQ8QZe05ZDQxI4KFHgTsWqoKFcmg/viewform\n"
-    "Mobile 👉 https://docs.google.com/forms/d/e/1FAIpQLSd_4mgsQa3pQi2wzuuOhU7y7XbzL1ruGNnfna4tYWL3AVSEpQ/viewform\n\n"
-    "🔍 *Просмотр таймингов:*  \n"
-    "https://docs.google.com/spreadsheets/d/1VM8PoYVnGRnCutLV7nvMJ9U1qT8G5d4Y8M-sMjopmCA/edit?gid=1788470692#gid=1788470692"
+    "‼️Напоминание‼️\n"
+    "‼️Не забудь заполнить тайминги‼️\n\n"
+    "📋 Форма для заполнения:\n"
+    "💻 Web: <a href='https://docs.google.com/forms/d/e/1FAIpQLSd6_bfaZ796YTEjf8rwmseQ8QZe05ZDQxI4KFHgTsWqoKFcmg/viewform'>ссылка</a>\n"
+    "📱 Mobile: <a href='https://docs.google.com/forms/d/e/1FAIpQLSd_4mgsQa3pQi2wzuuOhU7y7XbzL1ruGNnfna4tYWL3AVSEpQ/viewform'>ссылка</a>\n\n"
+    "🔍 Просмотр таймингов:\n"
+    "<a href='https://docs.google.com/spreadsheets/d/1VM8PoYVnGRnCutLV7nvMJ9U1qT8G5d4Y8M-sMjopmCA/edit?gid=1788470692#gid=1788470692'>открыть таблицу</a>"
 )
 
 def send_msg():
@@ -47,7 +47,7 @@ def send_msg():
         print("Ошибка при запросе:", e)
 
 # Время (UTC!)
-send_time = "05:15"  # УСТАНОВИ СВОЁ ВРЕМЯ В UTC!
+send_time = "05:25"  # УСТАНОВИ СВОЁ ВРЕМЯ В UTC!
 
 # планирование
 for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]:
