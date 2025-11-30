@@ -37,7 +37,7 @@ def send_msg():
     try:
         response = requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            data={"chat_id": CHAT_ID, "text": TEXT, "parse_mode": "Markdown"}
+            data={"chat_id": CHAT_ID, "text": TEXT, "parse_mode": "HTML"}
         )
         if response.status_code == 200:
             print("Сообщение отправлено!")
@@ -47,7 +47,7 @@ def send_msg():
         print("Ошибка при запросе:", e)
 
 # Время (UTC!)
-send_time = "05:25"  # УСТАНОВИ СВОЁ ВРЕМЯ В UTC!
+send_time = "05:32"  # УСТАНОВИ СВОЁ ВРЕМЯ В UTC!
 
 # планирование
 for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]:
