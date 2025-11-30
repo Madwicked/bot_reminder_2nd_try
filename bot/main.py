@@ -47,10 +47,10 @@ def send_msg():
         print("Ошибка при запросе:", e)
 
 # Время (UTC!)
-send_time = "05:00"  # УСТАНОВИ СВОЁ ВРЕМЯ В UTC!
+send_time = "05:15"  # УСТАНОВИ СВОЁ ВРЕМЯ В UTC!
 
 # планирование
-for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]:
+for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]:
     getattr(schedule.every(), day).at(send_time).do(send_msg)
 
 # ---------- Ping для предотвращения сна Render ----------
