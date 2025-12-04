@@ -25,7 +25,7 @@ def send_msg():
         response = requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
             data={"chat_id": CHAT_ID, "text": TEXT, "parse_mode": "HTML"},
-            timeout=10
+            timeout=15
         )
         return f"OK: {response.status_code}"
     except Exception as e:
@@ -35,15 +35,15 @@ def send_msg():
 def home():
     return "Bot is running!"
 
-# 🔥 endpoint для cron — отправляет сообщение
+# ✔ endpoint для cron-job.org — пробуждение
+@app.route("/wake")
+def wake():
+    return "OK"
+
+# ✔ endpoint который будет слать сообщение — вызывай его только 1 раз в день
 @app.route("/trigger")
 def trigger():
     return send_msg()
-
-# 🔥 endpoint для поддержания Render в активном состоянии
-@app.route("/wake")
-def wake():
-    return "awake"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
