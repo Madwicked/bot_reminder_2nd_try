@@ -35,10 +35,15 @@ def send_msg():
 def home():
     return "Bot is running!"
 
-# 🔥 endpoint для cron
+# 🔥 endpoint для cron — отправляет сообщение
 @app.route("/trigger")
 def trigger():
     return send_msg()
+
+# 🔥 endpoint для поддержания Render в активном состоянии
+@app.route("/wake")
+def wake():
+    return "awake"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
