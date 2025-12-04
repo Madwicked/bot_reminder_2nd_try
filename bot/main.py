@@ -38,7 +38,7 @@ def home():
 # ✔ endpoint для cron-job.org — пробуждение
 @app.route("/wake")
 def wake():
-    return "OK"
+    return "OK", 200
 
 # ✔ endpoint который будет слать сообщение — вызывай его только 1 раз в день
 @app.route("/trigger")
