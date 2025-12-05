@@ -36,9 +36,10 @@ def home():
     return "Bot is running!"
 
 # ✔ endpoint для cron-job.org — пробуждение
-@app.route("/wake")
+@app.route("/wake", methods=["GET", "HEAD"])
 def wake():
     return "OK", 200
+
 
 # ✔ endpoint который будет слать сообщение — вызывай его только 1 раз в день
 @app.route("/trigger")
