@@ -4,6 +4,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
+# ---- CONFIG ----
 TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise RuntimeError("BOT_TOKEN не задан")
@@ -20,21 +21,23 @@ TEXT = (
     "<a href='https://docs.google.com/spreadsheets/d/1VM8PoYVnGRnCutLV7nvMJ9U1qT8G5d4Y8M-sMjopmCA/edit'>открыть таблицу</a>"
 )
 
+# ---- LOGIC ----
 def send_msg():
     r = requests.post(
         f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-        data={"chat_id": CHAT_ID, "text": TEXT, "parse_mode": "HTML"},
+        data={
+            "chat_id": CHAT_ID,
+            "text": TEXT,
+            "parse_mode": "HTML",
+        },
         timeout=10,
     )
     return f"Telegram status: {r.status_code}"
 
+# ---- ROUTES ----
 @app.route("/")
 def home():
     return "OK"
-
-@app.route("/wake")
-def wake():
-    return "awake"
 
 @app.route("/trigger")
 def trigger():
