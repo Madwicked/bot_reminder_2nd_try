@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 from flask import Flask
 
@@ -10,6 +11,7 @@ if not TOKEN:
     raise RuntimeError("BOT_TOKEN не задан")
 
 CHAT_ID = -4993967051
+last_call = 0
 
 TEXT = (
     "‼️Напоминание‼️\n"
@@ -35,10 +37,17 @@ def send_msg():
     return f"Telegram status: {r.status_code}"
 
 # ---- ROUTES ----
-@app.route("/")
-def home():
+@app.route("/wake")
+def wake():
     return "OK"
 
 @app.route("/trigger")
 def trigger():
+    global last_call
+    now = time.time()
+
+    if now - last_call < 60:
+        return "Skipped (rate limit)", 200
+
+    last_call = now
     return send_msg()
