@@ -2,6 +2,7 @@ import os
 import time
 import requests
 from flask import Flask
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -10,7 +11,10 @@ TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise RuntimeError("BOT_TOKEN не задан")
 
-CHAT_ID = -4993967051
+CHAT_ID = os.getenv("CHAT_ID")
+if not CHAT_ID:
+    raise RuntimeError("CHAT_ID не задан")
+
 last_call = 0
 
 TEXT = (
@@ -44,8 +48,13 @@ def wake():
 @app.route("/trigger")
 def trigger():
     global last_call
-    now = time.time()
 
+    # ❌ Воскресенье — ничего не отправляем
+    # weekday(): Monday=0 ... Sunday=6
+    if datetime.utcnow().weekday() == 6:
+        return "Skipped (Sunday)", 200
+
+    now = time.time()
     if now - last_call < 60:
         return "Skipped (rate limit)", 200
 
